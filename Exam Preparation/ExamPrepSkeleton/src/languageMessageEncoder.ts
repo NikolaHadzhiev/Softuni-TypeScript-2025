@@ -32,14 +32,22 @@ export class LanguageMessageEncoder<TLanguage extends Language, TCipher extends 
             return "No message.";
         }
 
-        const strippedMessage = this.stripForbiddenSymbols(secretMessage);
-
-        if (!this.language.isCompatibleToCharset(strippedMessage)) {
+        if (Array.from(secretMessage).some(ch => 
+            !this.language.isCompatibleToCharset(ch) && 
+            !PartialMessageEncoder.forbiddenSymbols.includes(ch))) {
             return "Message not compatible.";
         }
 
-        const encodedMessage = this.cipher.encipher(strippedMessage);
-        this.encodedCharactersCount += strippedMessage.length;
+        const filtered = Array.from(secretMessage)
+            .filter(ch => this.language.isCompatibleToCharset(ch))
+            .join("");
+
+        if (filtered.length === 0) {
+            return "Message not compatible.";
+        }
+
+        const encodedMessage = this.cipher.encipher(filtered);
+        this.encodedCharactersCount += filtered.length;
         
         return encodedMessage;
     }
@@ -47,6 +55,10 @@ export class LanguageMessageEncoder<TLanguage extends Language, TCipher extends 
     public decodeMessage(secretMessage: MessageType): string {
         if (typeof secretMessage !== 'string' || secretMessage.length === 0) {
             return "No message.";
+        }
+
+        if (Array.from(secretMessage).some(ch => PartialMessageEncoder.forbiddenSymbols.includes(ch))) {
+            return "Message not compatible.";
         }
 
         if (!this.language.isCompatibleToCharset(secretMessage)) {
