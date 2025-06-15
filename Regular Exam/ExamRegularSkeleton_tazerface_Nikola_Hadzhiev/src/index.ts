@@ -4,6 +4,7 @@ import { Room } from "./contracts/room.js";
 import { SummerMonth, WinterMonth } from "./contracts/util.js";
 import { Motel } from "./contracts/motel.js";
 import { PartialMonthlyMotel } from "./contracts/partialMonthlyMotel.js";
+import { Apartment } from "./apartment.js";
 
 
 
